@@ -4,6 +4,7 @@ var taskIdCounter = 0;
 var pageContent = document.querySelector("#page-content");
 var tasksInProgressE1 = document.querySelector("#tasks-in-progress");
 var tasksCompletedE1 = document.querySelector("#tasks-completed");
+var tasks = [];
 
 var taskButtonHandler = function(event) {
   var targetE1 = event.target;
@@ -16,8 +17,6 @@ var taskButtonHandler = function(event) {
        var taskId = targetE1.getAttribute("data-task-id");
       deleteTask(taskId);
     }
-
-
 }
 
 
@@ -37,6 +36,12 @@ var taskStatusChangeHandler = function (event) {
     } else if (statusValue === "completed") {
         tasksCompletedE1.appendChild(taskSelected);
     }
+    for (var i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+          tasks[i].status = statusValue;
+        }
+      };
+      console.log(tasks);
 };
 var createTaskEl = function (taskDataObj) {
     // create list item
@@ -53,6 +58,10 @@ var createTaskEl = function (taskDataObj) {
 
     var taskActionsE1 = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionsE1);
+
+    taskDataObj.id = taskIdCounter;
+
+    tasks.push(taskDataObj);
   
     tasksToDoEl.appendChild(listItemEl);
   
@@ -75,7 +84,8 @@ var taskFormHandler = function(event) {
   // package up data as an object
   var taskDataObj = {
       name: taskNameInput,
-      type: taskTypeInput
+      type: taskTypeInput,
+      status: "to do"
   };
 
  if (isEdit) {
@@ -151,10 +161,16 @@ var completeEditTask = function (taskName, taskType, taskId) {
 
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
+
+    for (var i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+          tasks[i].name = taskName;
+          tasks[i].type = taskType;
+        };
     alert("Task Updated!");
 
     formEl.removeAttribute("data-task-id");
     document.querySelector("#save-task").textContent = "Add Task";
 };
-
+}
 pageContent.addEventListener("change", taskStatusChangeHandler);
